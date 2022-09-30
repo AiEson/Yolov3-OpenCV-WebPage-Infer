@@ -4,7 +4,7 @@ from flask import Flask, render_template, Response, request, jsonify
 from camera import VideoCamera
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./upload')
 # -*-coding:utf-8-*-
 import datetime
 import random
@@ -35,9 +35,7 @@ def gen(camera: VideoCamera):
 
 def infer_single(camera: VideoCamera, filepath):
     frame = camera.infer_single_img(filepath)
-    yield (b'--frame\r\n'
-           b'Content-Type: image/jpeg\r\n\r\n' + frame +
-           b'\r\n\r\n')
+    return frame
 
 
 @app.route('/video_feed')
@@ -67,8 +65,7 @@ def api_upload():
         new_filename = Pic_str().create_uuid() + '.' + ext
         f.save(os.path.join(file_dir, new_filename))
 
-        return Response(infer_single(VideoCamera(), os.path.join(file_dir, new_filename)), mimetype='multipart/x-mixed-replace; '
-                                                 'boundary=frame')
+        return infer_single(VideoCamera(), os.path.join(file_dir, new_filename))
     else:
         return jsonify({"error": 1001, "msg": "上传失败"})
 

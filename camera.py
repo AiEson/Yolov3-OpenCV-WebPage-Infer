@@ -1,3 +1,5 @@
+import os
+
 import cv2
 import numpy as np
 face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
@@ -42,9 +44,12 @@ class VideoCamera:
     def infer_single_img(self, filepath):
         img = cv2.imread(filepath, cv2.IMREAD_COLOR)
         img = yolo_object_detection(img, net, 0.5, 0.5, LABELS, COLORS)
-
-        ret, jpeg = cv2.imencode('.jpg', img)
-        return jpeg.tobytes()
+        filename = os.path.basename(filepath)
+        filename_mask = filename.replace('.' + filename.split('.')[-1], '') + "_mask." + filename.split('.')[-1]
+        print(filename_mask)
+        filename_mask_path = filepath.replace(filename, filename_mask)
+        cv2.imwrite(filename_mask_path, img)
+        return filename_mask_path
 
 
 
