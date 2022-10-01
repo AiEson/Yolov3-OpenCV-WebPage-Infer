@@ -1,10 +1,11 @@
 import os
 
 from flask import Flask, render_template, Response, request, jsonify
+from flask_cors import *
 from camera import VideoCamera
 from werkzeug.utils import secure_filename
 
-app = Flask(__name__, static_folder='./upload')
+app = Flask(__name__, static_folder='./static')
 # -*-coding:utf-8-*-
 import datetime
 import random
@@ -44,7 +45,7 @@ def video_feed():
                                                  'boundary=frame')
 
 
-basedir = './upload'
+basedir = './static/upload'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'JPG', 'PNG', 'gif', 'GIF', 'jpeg'])
 
 
@@ -54,6 +55,7 @@ def allowed_file(filename):
 
 # 上传文件
 @app.route('/up_photo', methods=['POST'], strict_slashes=False)
+@cross_origin(supports_credentials=True)
 def api_upload():
     file_dir = os.path.join(basedir)
     if not os.path.exists(file_dir):
